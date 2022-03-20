@@ -6,6 +6,10 @@ This project is intended to help automate repository level permissions for new r
 1. (optional) Adds [teams](https://docs.github.com/en/organizations/organizing-members-into-teams/about-teams) of your choosing to the repo with [permissions](https://docs.github.com/en/organizations/managing-access-to-your-organizations-repositories/repository-roles-for-an-organization) you specify.
 1. Create an [issue](https://github.com/features/issues) to document the updates.
 
+In addition to these repo-level settings, organization-level security setting should be configured. These are outside the scope of this project but can be configured manually:
+- [GitHub Actions Settings](https://docs.github.com/en/organizations/managing-organization-settings/disabling-or-limiting-github-actions-for-your-organization)
+- [Organization security settings](https://docs.github.com/en/organizations/keeping-your-organization-secure/managing-security-settings-for-your-organization/managing-security-and-analysis-settings-for-your-organization)
+
 ## Setup
 ### Initial setup
 1. Run `npm install` to download project dependencies
