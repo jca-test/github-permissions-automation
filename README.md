@@ -1,6 +1,6 @@
 # GitHub Permissions Automation
 This project is intended to help automate repository level permissions for new repositories using a [AWS Lambda function](https://aws.amazon.com/lambda/). This project listens to organization-level hooks and does the following:
-1. Checks if the [organization's default branch](https://docs.github.com/en/organizations/managing-organization-settings/managing-the-default-branch-name-for-repositories-in-your-organization) exists in the repo
+1. Checks if the repo's default branch exists in the repo. The default branch [can be set at the organization level](https://docs.github.com/en/organizations/managing-organization-settings/managing-the-default-branch-name-for-repositories-in-your-organization) for new repos.
     - if not, creates that branch with a README.md and a CODEOWNER's file
 1. Adds [branch protection settings](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/defining-the-mergeability-of-pull-requests/about-protected-branches) to that default branch
 1. (optional) Adds [teams](https://docs.github.com/en/organizations/organizing-members-into-teams/about-teams) of your choosing to the repo with [permissions](https://docs.github.com/en/organizations/managing-access-to-your-organizations-repositories/repository-roles-for-an-organization) you specify.
@@ -21,7 +21,7 @@ In addition to these repo-level settings, organization-level security setting sh
 chmod +x setup.sh
 ./setup.sh
 ```
-1. Edit generated (config.js)[src/config/config.js]
+4. Edit generated (config.js)[src/config/config.js]
 1. Rerun setup after configuration update to generated a new [zip](outputs/lambdaFunction.zip)
 
 ### Run for all existing repos in a org (standalone)
