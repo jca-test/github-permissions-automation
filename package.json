@@ -1,0 +1,27 @@
+{
+  "name": "github-test",
+  "version": "1.0.0",
+  "description": "Configure GitHub repos with default security settings",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "locally": "lambda-local -l index.js -h handler -e test-events/event.json"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jca-test/github-challenge.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jca-test/github-challenge/issues"
+  },
+  "homepage": "https://github.com/jca-test/github-challenge#readme",
+  "dependencies": {
+    "@octokit/rest": "^18.12.0",
+    "@octokit/webhooks": "^9.23.0"
+  },
+  "devDependencies": {
+    "eventsource": "^2.0.0"
+  }
+}
