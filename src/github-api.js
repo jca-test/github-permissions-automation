@@ -18,24 +18,28 @@ class GitHub {
     /**
      * Run all update procedures sequentially against repo
      */
-    async updateRepo(fullName){
+    async updateRepo(fullName, defaultBranch){
         // could grab direct from webhook (organization.login || owner.login) but need to read on the nuances of these two fields
         var [owner, repo] = fullName.split('/');
         console.log(`Updating repo: ${owner}/${repo}`);
 
-        var branchExists = await this.branchExists(owner, repo, this.settings.branchProtectionSettings.branch)
+        // If no branches exist, create one
+        var hasBranch = await this.branchExists(owner, repo, defaultBranch);
         // New repo or using a different branch, add branch with files
-        if (!branchExists) {
-            await this.createREADME(owner, repo);
-            await this.createCODEOWNERS(owner, repo);
+        if (!hasBranch) {
+            await this.createREADME(owner, repo, defaultBranch);
+            await this.createCODEOWNERS(owner, repo, defaultBranch);
         } else {
             this.logProcedure("Create README (skipped)");
             this.logProcedure("Create CODEOWNERS (skipped)");
         }
-        await this.SetBranchProtection(owner, repo);
+        await this.SetBranchProtection(owner, repo, defaultBranch);
         await this.addTeamsToRepo(owner, repo);
         await this.CreateIssue(owner, repo);
-        console.log(this.procedures);
+        console.log(`Finished updating: ${owner}/${repo}`);
+
+        // Clear out array
+        this.procedures = []
     }
     // =============================================================================================
     // ---------------------------------------------------------------------------------------------
@@ -70,6 +74,22 @@ class GitHub {
     logProcedure(procedure) {
         console.log(procedure);
         this.procedures.push(procedure);
+    }
+
+    /**
+     * List branches
+     */
+     async hasBranches(owner, repo) {
+        var exists = true;
+        try {
+            var data = await this.octokit.rest.repos.listBranches({
+                owner,
+                repo,
+            });
+        } catch (error) { // if error then branch DNE (need more precise handling than this)
+            exists = false;
+        }
+        return exists
     }
 
     /**
@@ -110,11 +130,11 @@ class GitHub {
      * @param String owner - owner/org that owns the repos
      * @param String repo - repo to create README in
      */
-    async createREADME(owner, repo) {
-        var path = "REAMDME.md";
+    async createREADME(owner, repo, branch) {
+        var path = "README.md";
         var contents =`#  ${repo}`;
         var message = "Add README";
-        await this.createFile(owner, repo, path, contents, message)
+        await this.createFile(owner, repo, path, contents, message, branch)
     }
 
     /**
@@ -122,7 +142,7 @@ class GitHub {
      * @param String owner - owner/org that owns the repos
      * @param String repo - repo to create README in
      */
-    async createCODEOWNERS(owner, repo) {
+    async createCODEOWNERS(owner, repo, branch) {
         if(this.settings.codeowners) {
             var path = "CODEOWNERS";
             var message = "Add CODEOWNERS";
@@ -130,20 +150,21 @@ class GitHub {
             for(var rule of this.settings.codeowners) {
                 contents += `${rule.files} ${rule.team}\n`;
             }
-            await this.createFile(owner, repo, path, contents, message);
+            await this.createFile(owner, repo, path, contents, message, branch);
         }
     }
 
     /**
      * Create an file in the repo's default branch
      */
-    async createFile(owner, repo, path, contents, message) {
+    async createFile(owner, repo, path, contents, message, branch) {
         try {
             // https://octokit.github.io/rest.js/v18#repos-create-or-update-file-contents
             var data = await this.octokit.rest.repos.createOrUpdateFileContents({
                 owner: owner,
                 repo: repo,
                 path: path,
+                branch: branch,
                 message: message,
                 content: new Buffer.from(contents).toString('base64'),
                 committer: this.settings.committer
@@ -162,7 +183,7 @@ class GitHub {
         for(var item of this.settings.teams){
             var team = item.name;
             var permission = item.permission;
-            console.log(`team: ${team}, permissions: ${permission}`);
+            this.debugLog(`adding team: ${team}, permissions: ${permission}`);
             await this.addTeamToRepo(owner, repo, team, permission);
         }
     }
@@ -193,11 +214,13 @@ class GitHub {
     /**
      * Set branch protection settings for this repo based on the configuration set in the constructor
      */
-    async SetBranchProtection(owner, repo) {
+    async SetBranchProtection(owner, repo, branch) {
         try {
             var branchProtections = this.settings.branchProtectionSettings;
             branchProtections.owner = owner;
             branchProtections.repo = repo;
+            branchProtections.branch = branch;
+
 
             // https://octokit.github.io/rest.js/v18#repos-update-branch-protection
             var data = await this.octokit.rest.repos.updateBranchProtection(
