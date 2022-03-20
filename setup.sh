@@ -7,7 +7,7 @@ CONFIG_DIR="src/config/"
 WEBHOOK_SECRET_SEARCH="{{webhook_secret}}"
 GITHUB_TOKEN_SEARCH="{{github_token}}"
 SAMPLE_CONFIG="${CONFIG_DIR}/config.example.js"
-USER_CONFIG="${CONFIG_DIR}/config2.js"
+USER_CONFIG="${CONFIG_DIR}/config.js"
 
 # https://stackoverflow.com/questions/3466166/how-to-check-if-running-in-cygwin-mac-or-linux
 if [[ "$(uname)" == "Darwin" ]]; then
