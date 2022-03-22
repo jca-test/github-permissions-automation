@@ -30,4 +30,4 @@ fi
 
 # Make a zip for lambda
 mkdir -p output
-zip -r output/lambdaFunction.zip *
+zip -x runExisting.js -r output/lambdaFunction.zip *
