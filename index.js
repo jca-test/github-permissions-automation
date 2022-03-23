@@ -22,7 +22,7 @@ function handleError(error) {
 async function handleWebhook(data) {
     try {
         var payload = data.payload
-        await github.updateRepo(payload.repository.full_name);
+        await github.updateRepo(payload.repository.full_name, payload.repository.default_branch);
 
     } catch(error) {
         handleError(error);
