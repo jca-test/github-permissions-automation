@@ -19,7 +19,7 @@
   "homepage": "https://github.com/jca-test/github-challenge#readme",
   "dependencies": {
     "@octokit/rest": "^18.12.0",
-    "@octokit/webhooks": "^9.23.0"
+    "@octokit/webhooks": "^9.26.3"
   },
   "devDependencies": {
     "eventsource": "^2.0.0"
